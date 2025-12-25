@@ -1,17 +1,5 @@
 # 📡 Event-Driven Microservices with RabbitMQ, Spring Cloud Function & Spring Cloud Stream
-![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)  
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white)  
-![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=spring&logoColor=white)  
-![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-6DB33F?style=for-the-badge&logo=spring&logoColor=white)  
-![Spring Cloud Stream](https://img.shields.io/badge/Spring%20Cloud%20Stream-6DB33F?style=for-the-badge&logo=spring&logoColor=white)  
-![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)  
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)  
-![Keycloak](https://img.shields.io/badge/Keycloak-262626?style=for-the-badge&logo=keycloak&logoColor=white)  
-![OAuth2](https://img.shields.io/badge/OAuth2-4285F4?style=for-the-badge&logo=oauth&logoColor=white)  
-![OpenID Connect](https://img.shields.io/badge/OpenID_Connect-000000?style=for-the-badge&logo=openid&logoColor=white)  
-![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)  
-![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)  
-
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=spring&logoColor=white) ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-6DB33F?style=for-the-badge&logo=spring&logoColor=white) ![Spring Cloud Stream](https://img.shields.io/badge/Spring%20Cloud%20Stream-6DB33F?style=for-the-badge&logo=spring&logoColor=white) ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Keycloak](https://img.shields.io/badge/Keycloak-262626?style=for-the-badge&logo=keycloak&logoColor=white) ![OAuth2](https://img.shields.io/badge/OAuth2-4285F4?style=for-the-badge&logo=oauth&logoColor=white) ![OpenID Connect](https://img.shields.io/badge/OpenID_Connect-000000?style=for-the-badge&logo=openid&logoColor=white) ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white) ![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
 
 This section focuses on building **loosely coupled, scalable, and resilient microservices** using **event-driven architecture**.  
 We solve key challenges of synchronous REST-based systems by introducing **asynchronous messaging**.
