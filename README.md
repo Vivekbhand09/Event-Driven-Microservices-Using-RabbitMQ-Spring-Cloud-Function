@@ -348,4 +348,347 @@ Consumer<PaymentEvent> consumer();
 - Production-ready microservices
 
 ---
+## 🌊 What Is Spring Cloud Stream?
+
+**Spring Cloud Stream** is a framework built on top of **Spring Boot** that helps developers build **event-driven microservices** using messaging systems like **RabbitMQ** and **Kafka**.
+
+It allows microservices to **produce and consume events** without writing low-level broker-specific code.
+
+📌 In short:  
+> Spring Cloud Stream connects your business logic to messaging systems in a simple, declarative way.
+
+---
+
+## 🎯 Why Do We Need Spring Cloud Stream?
+
+In event-driven systems:
+- Services must communicate asynchronously
+- Messaging brokers (RabbitMQ/Kafka) have complex APIs
+- Tight coupling with broker code reduces flexibility
+
+Spring Cloud Stream solves this by:
+- Abstracting messaging infrastructure
+- Removing broker-specific code
+- Letting developers focus on **business logic only**
+
+---
+
+## 💡 Main Idea of Spring Cloud Stream
+
+The core idea is **separation of concerns**:
+
+- ❌ Business logic should NOT know about exchanges, queues, topics
+- ✅ Messaging infrastructure should be handled by framework
+
+Spring Cloud Stream:
+- Automatically connects your app to message brokers
+- Handles serialization, routing, retries, and acknowledgements
+- Allows switching brokers without code changes
+
+📌 Write once → Run with RabbitMQ or Kafka
+
+---
+
+## 🧱 Core Building Blocks of Spring Cloud Stream
+
+### 1️⃣ Destination Binders
+
+A **binder** is a bridge between:
+- Spring Cloud Stream
+- Messaging system (RabbitMQ, Kafka)
+
+Examples:
+- RabbitMQ Binder
+- Kafka Binder
+
+📌 Binder responsibility:
+- Create exchanges / topics
+- Create queues
+- Manage connections to broker
+
+---
+
+### 2️⃣ Destination Bindings
+
+**Destination Binding** connects:
+- A function (Supplier / Function / Consumer)
+- To a messaging destination (queue/topic)
+
+Binding defines:
+- Where messages are sent
+- Where messages are received from
+
+📌 Example:
+- Producer → exchange
+- Consumer → queue
+
+---
+
+### 3️⃣ Message
+
+A **message** is the actual data sent between services.
+
+It contains:
+- Payload (business data)
+- Headers (metadata)
+
+Messages are:
+- Serialized automatically (JSON by default)
+- Transported asynchronously
+- Broker-managed (durability, retries, acknowledgments)
+
+---
+
+## 🔁 How Spring Cloud Stream Works (High Level)
+
+1. Business logic produces or consumes data
+2. Spring Cloud Stream converts data into messages
+3. Binder sends message to broker
+4. Broker routes message to destination
+5. Consumer receives and processes message
+
+📌 Producer and Consumer never communicate directly
+
+
+
+---
+
+# 📢 Implementing Event-Driven Communication Using Spring Cloud Stream & RabbitMQ
+
+This section demonstrates how **event-driven microservices** are implemented using  
+**Spring Cloud Function + Spring Cloud Stream + RabbitMQ**, enabling **asynchronous, loosely coupled communication** between services.
+
+---
+
+## 🧩 Step 1: Create Message Service
+
+A new **Message Service** was created using **Spring Initializr** with the following dependencies:
+
+- Spring Cloud Function
+- Spring Cloud Stream
+- Spring Cloud Stream Binder RabbitMQ
+- Spring Cloud Function Web
+- Spring Boot Test
+- Spring Cloud Stream Test Binder
+
+---
+
+## 📦 Message Service Dependencies (pom.xml)
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-stream</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-stream-test-binder</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+---
+
+## 📄 Step 2: Create DTO (Message Payload)
+
+Inside the `dto` package, a DTO was created to represent the message sent between services.
+
+```java
+public record AccountsMsgDto(
+        Long accountNumber,
+        String name,
+        String email,
+        String mobileNumber
+) {
+}
+```
+
+📌 This DTO acts as the **event payload** shared across microservices.
+
+---
+
+## ⚙️ Step 3: Create Spring Cloud Functions
+
+Inside a `functions` package, a `MessageFunctions` class was created.  
+It defines **two Spring Cloud Functions**: `email` and `sms`.
+
+```java
+public class MessageFunctions {
+
+    private static final Logger log = LoggerFactory.getLogger(MessageFunctions.class);
+
+    @Bean
+    public Function<AccountsMsgDto, AccountsMsgDto> email() {
+        return accountsMsgDto -> {
+            log.info("Sending email with the details : {}", accountsMsgDto);
+            return accountsMsgDto;
+        };
+    }
+
+    @Bean
+    public Function<AccountsMsgDto, Long> sms() {
+        return accountsMsgDto -> {
+            log.info("Sending sms with the details : {}", accountsMsgDto);
+            return accountsMsgDto.accountNumber();
+        };
+    }
+}
+```
+
+📌 **Key Concept**
+- Functions contain **only business logic**
+- Messaging infrastructure is handled by Spring Cloud Stream
+
+---
+
+## 🔗 Step 4: Function Chaining Configuration
+
+The two functions are chained using **email | sms** so they execute sequentially.
+
+### 📄 Message Service application.yml
+
+```yaml
+server:
+  port: 9010
+
+spring:
+  application:
+    name: message
+
+  cloud:
+    function:
+      definition: email|sms
+
+    stream:
+      bindings:
+        emailsms-in-0:
+          destination: send-communication
+          group: ${spring.application.name}
+
+        emailsms-out-0:
+          destination: communication-sent
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s
+```
+
+📌 Flow:
+- Input Queue → `send-communication`
+- Functions executed → `email` ➜ `sms`
+- Output Queue → `communication-sent`
+
+---
+
+## 🏦 Step 5: Configure Accounts Service as Event Producer
+
+The **Accounts Service** publishes events whenever a new account is created.
+
+### 📄 Accounts Service DTO
+
+```java
+public record AccountsMsgDto(
+        Long accountNumber,
+        String name,
+        String email,
+        String mobileNumber
+) {
+}
+```
+
+---
+
+## 🧠 Step 6: Publish Event from Accounts Service
+
+Inside `AccountServiceImpl`, an event is published **after successful account creation**.
+
+```java
+@Override
+public void createAccount(CustomerDto customerDto) {
+
+    Customer customer = CustomerMapper.mapToCustomer(customerDto, new Customer());
+
+    Optional<Customer> optionalCustomer =
+            customerRepository.findByMobileNumber(customerDto.getMobileNumber());
+
+    if (optionalCustomer.isPresent()) {
+        throw new CustomerAlreadyExistsException(
+                "Customer already registered with given mobileNumber " + customerDto.getMobileNumber()
+        );
+    }
+
+    Customer savedCustomer = customerRepository.save(customer);
+    Accounts savedAccount = accountsRepository.save(createNewAccount(savedCustomer));
+
+    sendCommunication(savedAccount, savedCustomer);
+}
+```
+
+---
+
+## 📤 Step 7: Send Event Using StreamBridge
+
+```java
+private void sendCommunication(Accounts account, Customer customer) {
+
+    var accountsMsgDto = new AccountsMsgDto(
+            account.getAccountNumber(),
+            customer.getName(),
+            customer.getEmail(),
+            customer.getMobileNumber()
+    );
+
+    log.info("Sending Communication request for the details: {}", accountsMsgDto);
+
+    var result = streamBridge.send("sendCommunication-out-0", accountsMsgDto);
+
+    log.info("Is the Communication request successfully triggered ? : {}", result);
+}
+```
+
+📌 **Why StreamBridge?**
+- Sends messages dynamically
+- No tight coupling to RabbitMQ
+- Producer doesn’t know the consumer
+
+---
+
+## 🔁 End-to-End Event Flow
+
+1️⃣ Account created in **Accounts Service**  
+2️⃣ Event published to `send-communication`  
+3️⃣ **Message Service** consumes the event  
+4️⃣ `email` function executes  
+5️⃣ `sms` function executes  
+6️⃣ Final event published to `communication-sent`  
+
+---
+
+## ✅ What This Implementation Achieves
+
+- ✔️ Avoids temporal coupling  
+- ✔️ Enables asynchronous communication  
+- ✔️ Implements event-driven microservices  
+- ✔️ Improves scalability and fault tolerance  
+- ✔️ Decouples producers and consumers  
+
+---
+
+🚀 **This completes the Event-Driven Microservices implementation using  
+Spring Cloud Stream, Spring Cloud Function, and RabbitMQ**
 
