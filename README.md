@@ -689,6 +689,82 @@ private void sendCommunication(Accounts account, Customer customer) {
 
 ---
 
-🚀 **This completes the Event-Driven Microservices implementation using  
-Spring Cloud Stream, Spring Cloud Function, and RabbitMQ**
+## 🐇 RabbitMQ Setup & Verification (AMQP)
+
+After implementing **event-driven communication using Spring Cloud Stream and RabbitMQ**, the next step was to **run RabbitMQ locally and verify message flow** through the RabbitMQ Management Console.
+
+
+
+## 🚀 Running RabbitMQ Using Docker
+
+RabbitMQ was started using the official **RabbitMQ Management** Docker image:
+
+```bash
+docker run -it --rm --name rabbitmq \
+-p 5672:5672 \
+-p 15672:15672 \
+rabbitmq:4-management
+```
+
+### 🔑 What This Does
+- `5672` → AMQP port (used by applications)  
+- `15672` → Management UI port  
+- Management plugin enabled by default  
+
+### 🌐 Accessing RabbitMQ Management Console
+Once the container was running, the RabbitMQ dashboard was accessed at:
+
+```
+http://localhost:15672/
+```
+
+**Default credentials:**
+- Username: `guest`  
+- Password: `guest`  
+
+---
+
+## 🔁 Verifying Exchanges (Event Routing)
+
+📌 **Screenshot: Exchanges View**  
+This screenshot shows the exchanges automatically created by Spring Cloud Stream based on application configuration.
+
+**Observed Exchanges:**
+- `send-communication`  
+- `communication-sent`  
+
+ 
+![RabbitMQ Architecture](utils/amqp1.png)
+
+➡️ These exchanges are used to route messages between microservices.
+
+---
+
+## 📬 Verifying Queues (Message Storage)
+
+📌 **Screenshot: Queues View**  
+This screenshot confirms that queues were successfully created and bound to exchanges.
+
+**Observed Queues:**
+- `send-communication.message`  
+- `communication-sent.accounts`  
+
+![RabbitMQ Architectur](utils/amqp2.png)
+
+➡️ Each queue represents a consumer group subscribed to an exchange.
+
+---
+
+## 🧠 What This Confirms
+
+✔️ RabbitMQ broker is running successfully  
+✔️ Spring Cloud Stream auto-created exchanges  
+✔️ Queues are bound correctly  
+✔️ Message producer and consumer are connected  
+✔️ Event-driven communication is working end-to-end  
+
+✅ This validates the successful integration of RabbitMQ with Spring Cloud Stream in the EazyBank microservices architecture
+
+
+
 
