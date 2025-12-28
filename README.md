@@ -159,12 +159,6 @@ In EDA:
 ### 5️⃣ Consumer (Subscriber)
 - Processes messages asynchronously
 
----
-### 🐇 RabbitMQ – Working Architecture
-
-The following diagram illustrates the **working flow of RabbitMQ** in a microservices environment, showing how messages move from producers to consumers through the broker.
-
-![RabbitMQ Architecture](utils/rabbit.png)
 
 ---
 
